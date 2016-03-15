@@ -23,6 +23,7 @@
 //----------------------------------------------------------------------
 
 import java.awt.*;
+import java.awt.event.MouseEvent;
 
 public class Diplomacy extends Frame implements Runnable
 {
@@ -35,6 +36,8 @@ public class Diplomacy extends Frame implements Runnable
 	// frame size
 	final int frameWidth = winWidth;
 	final int frameHeight = winHeight + 50;
+
+	Panel innerPanel;
 
 	// map
 	final int mapWidth = 693;
@@ -115,6 +118,9 @@ public class Diplomacy extends Frame implements Runnable
 	public Diplomacy(String s)
 	{
 		super(s);
+		innerPanel = new Panel();
+		this.add(innerPanel);
+
 	}
 
 	public void init()
@@ -181,9 +187,6 @@ public class Diplomacy extends Frame implements Runnable
 
 		resize(frameWidth, frameHeight);
 	}
-
-
-
 
 	public void update(Graphics g) 
 	{
@@ -257,17 +260,17 @@ public class Diplomacy extends Frame implements Runnable
 		// if we're in play mode, draw in static and moveable pieces.
 		if((!helpText)&&(!aboutText))
 		{
-		  g.drawImage(mapimage, 0, 0, this);
+		  g.drawImage(mapimage, 0, 0, this.innerPanel);
 
-		  g.drawImage(trashcanimage,trashcanX,trashcanY,this);
+		  g.drawImage(trashcanimage,trashcanX,trashcanY,this.innerPanel);
 
 		  for(int i=(numberIndexPieces-1);i>=0;i--)
 		  {
-			index_pieces[i].drawPiece(g,this);
+			index_pieces[i].drawPiece(g,this.innerPanel);
 		  }
 		  for(int i=numberPieces;i>=0;i--)
 		  {
-			pieces[i].drawPiece(g,this);
+			pieces[i].drawPiece(g,this.innerPanel);
 		  }
 		}
 		// otherwise, display the static pieces and whatever text is appropriate
@@ -277,9 +280,9 @@ public class Diplomacy extends Frame implements Runnable
 			wordHeight = wordMetrics.getHeight();
 			for(int i=(numberIndexPieces-1);i>=0;i--)
 			{
-				index_pieces[i].drawPiece(g,this);
+				index_pieces[i].drawPiece(g,this.innerPanel);
 			}
-			g.drawImage(trashcanimage,trashcanX,trashcanY,this);
+			g.drawImage(trashcanimage,trashcanX,trashcanY,this.innerPanel);
 			if(helpText)
 			{
 				g.drawString("Clicking and dragging the mouse on any of the pieces",
@@ -324,15 +327,19 @@ public class Diplomacy extends Frame implements Runnable
 
 	// *************** Event handling *******************
 
-	public boolean mouseDown(java.awt.Event event, int x, int y)
+	public void processMouseEvent(MouseEvent mouseEvent)
+		//java.awt.Event event, int x, int y)
 	{
+		Point eventLocation = mouseEvent.getPoint();
+		int x = eventLocation.x;
+		int y = eventLocation.y;
 		int currentPiece = 0;
 
 		// temp is used for swapping.
 		Piece temp;
 		if(helpText||aboutText)
 		{
-		  return(true);
+		  return;
 		}
 
 		// else, determine if the mouseDown was on an index piece.
@@ -393,7 +400,7 @@ public class Diplomacy extends Frame implements Runnable
 		// now that things have changed, repaint().
 		repaint();
 
-		return true;
+		return;
 	}
 
 	public boolean mouseDrag(java.awt.Event event, int x, int y)
@@ -476,6 +483,7 @@ public class Diplomacy extends Frame implements Runnable
 		{
 		  offScreenImage = createImage (frameWidth, frameHeight);
 		  offScreen = offScreenImage.getGraphics ();
+
 		} 
 		catch (Exception e) 
 		{
